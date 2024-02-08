@@ -1,8 +1,24 @@
 import Link from '../models/Link.model.js';
+import { checkAlias, checkURL } from '../utils/index.js';
 
 export default class LinkController {
   static async createLink(req, res) {
     const { url, alias } = req.body;
+
+    if (checkURL(url)) {
+      return res
+        .status(401)
+        .json({ message: `You should provide correct URL` });
+    }
+
+    if (checkAlias(alias)) {
+      return res
+        .status(401)
+        .json({
+          message: `Alias should consist only of english letters and digits`,
+        });
+    }
+
     const duplicateUrl = await Link.findOne({ url });
     if (duplicateUrl) {
       return res.json({ alias: duplicateUrl.alias });
